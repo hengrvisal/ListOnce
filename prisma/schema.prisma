@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Marketplace {
+  ETSY
+  EBAY
+  AMAZON
+  FACEBOOK
+}
+
+enum ListingStatus {
+  QUEUED
+  RUNNING
+  LIVE
+  FAILED
+}
+
+model Product {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  title       String
+  description String
+  price       Float
+  category    String
+  quantity    Int
+  images      String[]
+  variants    Json?
+  listings    Listing[]
+}
+
+model Listing {
+  id           String        @id @default(cuid())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  productId    String
+  product      Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  marketplace  Marketplace
+  status       ListingStatus @default(QUEUED)
+  listingUrl   String?
+  errorMessage String?
+  agentRunId   String?
+}
