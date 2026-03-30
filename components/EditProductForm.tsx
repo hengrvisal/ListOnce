@@ -5,18 +5,15 @@ import { useRouter } from "next/navigation";
 import ImageUrlInput from "./ImageUrlInput";
 import type { CreateProductPayload } from "@/types";
 
-export default function NewProductForm() {
+interface EditProductFormProps {
+  id: string;
+  initial: CreateProductPayload;
+}
+
+export default function EditProductForm({ id, initial }: EditProductFormProps) {
   const router = useRouter();
 
-  const [form, setForm] = useState<CreateProductPayload>({
-    title: "",
-    description: "",
-    price: 0,
-    category: "",
-    quantity: 1,
-    images: [],
-  });
-
+  const [form, setForm] = useState<CreateProductPayload>(initial);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,8 +33,8 @@ export default function NewProductForm() {
     setError(null);
 
     try {
-      const res = await fetch("/api/products", {
-        method: "POST",
+      const res = await fetch(`/api/products/${id}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
@@ -47,10 +44,10 @@ export default function NewProductForm() {
         throw new Error(data.error ?? "Something went wrong");
       }
 
-      router.push("/products");
+      router.push(`/products/${id}`);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create product");
+      setError(err instanceof Error ? err.message : "Failed to update product");
     } finally {
       setSubmitting(false);
     }
@@ -167,13 +164,20 @@ export default function NewProductForm() {
       </div>
 
       {/* Submit */}
-      <div className="pt-2">
+      <div className="flex gap-3 pt-2">
         <button
           type="submit"
           disabled={submitting}
-          className="w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {submitting ? "Creating product..." : "Create product"}
+          {submitting ? "Saving..." : "Save changes"}
+        </button>
+        <button
+          type="button"
+          onClick={() => router.push(`/products/${id}`)}
+          className="px-6 py-3 rounded-xl font-semibold text-sm border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          Cancel
         </button>
       </div>
     </form>

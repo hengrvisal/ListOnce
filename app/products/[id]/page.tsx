@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import DeleteProductButton from "@/components/DeleteProductButton";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -50,6 +51,19 @@ export default async function ProductDetailPage({ params }: Props) {
         <span className="text-gray-800 font-medium truncate">{product.title}</span>
       </nav>
 
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">{product.title}</h1>
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/products/${product.id}/edit`}
+            className="px-4 py-2 rounded-lg text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
+          >
+            Edit
+          </Link>
+          <DeleteProductButton id={product.id} />
+        </div>
+      </div>
+
       <div className="bg-white border border-gray-200 rounded-2xl p-8 space-y-6">
         {/* Images */}
         {product.images.length > 0 && (
@@ -66,10 +80,9 @@ export default async function ProductDetailPage({ params }: Props) {
           </div>
         )}
 
-        {/* Title & meta */}
+        {/* Meta */}
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{product.title}</h1>
-          <div className="flex flex-wrap gap-4 mt-2 text-sm text-gray-500">
+          <div className="flex flex-wrap gap-4 text-sm text-gray-500">
             <span>Category: <strong className="text-gray-700">{product.category}</strong></span>
             <span>Price: <strong className="text-indigo-600">{formattedPrice}</strong></span>
             <span>Qty: <strong className="text-gray-700">{product.quantity}</strong></span>
